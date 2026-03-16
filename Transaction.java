@@ -8,15 +8,19 @@ public class Transaction {
     private static HashSet<String> usedIds = new HashSet<>();
 
     private String transactionId;
-    private long otherMobile;
+    private long senderMobile;
+    private long receiverMobile;
+    private String senderBank;
+    private String receiverBank;
     private double amount;
-    private String type;
     private LocalDateTime time;
 
-    public Transaction(long otherMobile, double amount, String type) {
-        this.otherMobile = otherMobile;
+    public Transaction(long senderMobile, long receiverMobile, String senderBank, String receiverBank, double amount) {
+        this.senderMobile = senderMobile;
+        this.receiverMobile = receiverMobile;
+        this.senderBank = senderBank;
+        this.receiverBank = receiverBank;
         this.amount = amount;
-        this.type = type;
         this.time = LocalDateTime.now();
         this.transactionId = generateTransactionId();
     }
@@ -26,7 +30,7 @@ public class Transaction {
         String id;
 
         do {
-            int hash = (otherMobile + "" + amount + type + time).hashCode() & 0x7fffffff;
+            int hash = (senderMobile + "" + receiverMobile + amount + time).hashCode() & 0x7fffffff;
             id = "TXN" + hash;
         } while (usedIds.contains(id));
 
@@ -38,16 +42,24 @@ public class Transaction {
         return transactionId;
     }
 
-    public long getOtherMobile() {
-        return otherMobile;
+    public long getSenderMobile() {
+        return senderMobile;
+    }
+
+    public long getReceiverMobile() {
+        return receiverMobile;
+    }
+
+    public String getSenderBank() {
+        return senderBank;
+    }
+
+    public String getReceiverBank() {
+        return receiverBank;
     }
 
     public double getAmount() {
         return amount;
-    }
-
-    public String getType() {
-        return type;
     }
 
     public LocalDateTime getTime() {

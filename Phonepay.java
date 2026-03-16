@@ -21,7 +21,8 @@ public class Phonepay {
             System.out.println("4. Display All Users");
             System.out.println("5. Display User Details");
             System.out.println("6. Show Transactions");
-            System.out.println("7. Exit");
+            System.out.println("7. Search Transaction");
+            System.out.println("8. Exit");
             System.out.print("Enter choice: ");
 
             int choice = sc.nextInt();
@@ -33,7 +34,8 @@ public class Phonepay {
                 case 4: displayAllUsers(); break;
                 case 5: displayUserDetails(); break;
                 case 6: showTransactions(); break;
-                case 7:
+                case 7: searchTransaction(); break;
+                case 8:
                     System.out.println("Thank you for using PhonePe!");
                     return;
                 default:
@@ -49,16 +51,16 @@ public class Phonepay {
         return null;
     }
 
-    static User findUserByUpi(String upi) {
+    static User findUserByAccount(long accNo) {
         for (User u : users)
-            if (u.getUpiId().equalsIgnoreCase(upi))
+            if (u.getAccountNo() == accNo)
                 return u;
         return null;
     }
 
-    static User findUserByAccount(long accNo) {
+    static User findUserByUpi(String upi) {
         for (User u : users)
-            if (u.getAccountNo() == accNo)
+            if (u.getUpiId().equalsIgnoreCase(upi))
                 return u;
         return null;
     }
@@ -78,23 +80,49 @@ public class Phonepay {
         TransactionService.addMoney(user, sc);
     }
 
+    static User getUser() {
+
+        System.out.println("1. Mobile Number");
+        System.out.println("2. Account Number");
+        System.out.println("3. UPI ID");
+        System.out.print("Choose option: ");
+
+        int option = sc.nextInt();
+
+        if (option == 1) {
+            System.out.print("Enter Mobile Number: ");
+            long mobile = sc.nextLong();
+            return findUser(mobile);
+        }
+
+        if (option == 2) {
+            System.out.print("Enter Account Number: ");
+            long acc = sc.nextLong();
+            return findUserByAccount(acc);
+        }
+
+        if (option == 3) {
+            sc.nextLine();
+            System.out.print("Enter UPI ID: ");
+            String upi = sc.nextLine();
+            return findUserByUpi(upi);
+        }
+
+        return null;
+    }
+
     static void transferMoney() {
 
-        sc.nextLine();
-        System.out.print("Enter Sender UPI ID: ");
-        String senderUpi = sc.nextLine();
-
-        User sender = findUserByUpi(senderUpi);
+        System.out.println("Select Sender");
+        User sender = getUser();
 
         if (sender == null) {
             System.out.println("Sender not found!");
             return;
         }
 
-        System.out.print("Enter Receiver UPI ID: ");
-        String receiverUpi = sc.nextLine();
-
-        User receiver = findUserByUpi(receiverUpi);
+        System.out.println("Select Receiver");
+        User receiver = getUser();
 
         if (receiver == null) {
             System.out.println("Receiver not found!");
@@ -171,5 +199,14 @@ public class Phonepay {
         }
 
         TransactionService.showTransactions(user);
+    }
+
+    static void searchTransaction() {
+
+        sc.nextLine();
+        System.out.print("Enter Transaction ID: ");
+        String id = sc.nextLine();
+
+        TransactionService.searchTransaction(id);
     }
 }
