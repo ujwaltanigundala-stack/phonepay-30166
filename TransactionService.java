@@ -43,13 +43,8 @@ public class TransactionService {
         sender.deductBalance(amt);
         receiver.addBalance(amt);
 
-        sender.addTransaction(
-                new Transaction(receiver.getMobile(), amt, "DEBIT")
-        );
-
-        receiver.addTransaction(
-                new Transaction(sender.getMobile(), amt, "CREDIT")
-        );
+        sender.addTransaction(new Transaction(receiver.getMobile(), amt, "DEBIT"));
+        receiver.addTransaction(new Transaction(sender.getMobile(), amt, "CREDIT"));
 
         System.out.println("Transfer successful!");
     }
@@ -65,13 +60,10 @@ public class TransactionService {
 
         System.out.println("\n======= TRANSACTION HISTORY =======");
 
-        int count = 1;
-
         for (Transaction t : tx) {
 
-            System.out.println("\nTransaction #" + count++);
             System.out.println("-------------------------------");
-
+            System.out.println("Transaction ID : " + t.getTransactionId());
             System.out.println("Type      : " + t.getType());
 
             if (t.getOtherMobile() == 0)
@@ -83,11 +75,7 @@ public class TransactionService {
             System.out.println("Date-Time : " + t.getTime().format(FMT));
         }
 
-        System.out.printf(
-                "\nCurrent Balance : ₹%.2f%n",
-                user.getBalance()
-        );
-
+        System.out.printf("\nCurrent Balance : ₹%.2f%n", user.getBalance());
         System.out.println("===================================");
     }
 }

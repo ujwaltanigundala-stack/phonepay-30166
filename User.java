@@ -9,15 +9,16 @@ public class User {
     private double balance;
     private Bank bank;
     private long accountNo;
+    private String upiId;
     private ArrayList<Transaction> transactions;
 
-    public User(long mobile, String name, double balance,
-                Bank bank, long accountNo) {
+    public User(long mobile, String name, double balance, Bank bank, long accountNo, String upiId) {
         this.mobile = mobile;
         this.name = name;
         this.balance = balance;
         this.bank = bank;
         this.accountNo = accountNo;
+        this.upiId = upiId;
         this.transactions = new ArrayList<>();
     }
 
@@ -39,6 +40,10 @@ public class User {
 
     public long getAccountNo() {
         return accountNo;
+    }
+
+    public String getUpiId() {
+        return upiId;
     }
 
     public void addBalance(double amount) {

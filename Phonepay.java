@@ -10,9 +10,9 @@ public class Phonepay {
 
     public static void main(String[] args) {
 
-        banks.add(new Bank("SBI", 11));
-        banks.add(new Bank("HDFC", 12));
-        banks.add(new Bank("ICICI", 12));
+        banks.add(new SBI());
+        banks.add(new HDFC());
+        banks.add(new ICICI());
 
         while (true) {
             System.out.println("\n1. Add User");
@@ -27,7 +27,7 @@ public class Phonepay {
             int choice = sc.nextInt();
 
             switch (choice) {
-                case 1: addUser(); break;
+                case 1: UPIRegistration.registerUser(sc); break;
                 case 2: addMoney(); break;
                 case 3: transferMoney(); break;
                 case 4: displayAllUsers(); break;
@@ -49,6 +49,13 @@ public class Phonepay {
         return null;
     }
 
+    static User findUserByUpi(String upi) {
+        for (User u : users)
+            if (u.getUpiId().equalsIgnoreCase(upi))
+                return u;
+        return null;
+    }
+
     static User findUserByAccount(long accNo) {
         for (User u : users)
             if (u.getAccountNo() == accNo)
@@ -56,38 +63,8 @@ public class Phonepay {
         return null;
     }
 
-    static void addUser() {
-        System.out.print("Enter Mobile Number: ");
-        long mobile = sc.nextLong();
-
-        if (findUser(mobile) != null) {
-            System.out.println("User already exists!");
-            return;
-        }
-
-        sc.nextLine();
-        System.out.print("Enter Name: ");
-        String name = sc.nextLine();
-
-        System.out.println("Select Bank:");
-        for (int i = 0; i < banks.size(); i++)
-            System.out.println((i + 1) + ". " + banks.get(i).getName());
-
-        int choice = sc.nextInt();
-        Bank bank = banks.get(choice - 1);
-
-        System.out.print("Enter Account Number (" +
-                bank.getAccLength() + " digits): ");
-        long accNo = sc.nextLong();
-
-        System.out.print("Enter Initial Balance: ");
-        double bal = sc.nextDouble();
-
-        users.add(new User(mobile, name, bal, bank, accNo));
-        System.out.println("User added successfully!");
-    }
-
     static void addMoney() {
+
         System.out.print("Enter Mobile Number: ");
         long mobile = sc.nextLong();
 
@@ -103,36 +80,21 @@ public class Phonepay {
 
     static void transferMoney() {
 
-        System.out.println("Select sender by:");
-        System.out.println("1. Mobile Number");
-        System.out.println("2. Account Number");
-        int fromChoice = sc.nextInt();
+        sc.nextLine();
+        System.out.print("Enter Sender UPI ID: ");
+        String senderUpi = sc.nextLine();
 
-        User sender = null;
-
-        if (fromChoice == 1) {
-            System.out.print("Enter Sender Mobile: ");
-            long mob = sc.nextLong();
-            sender = findUser(mob);
-        } 
-        else if (fromChoice == 2) {
-            System.out.print("Enter Sender Account No: ");
-            long acc = sc.nextLong();
-            sender = findUserByAccount(acc);
-        }
+        User sender = findUserByUpi(senderUpi);
 
         if (sender == null) {
             System.out.println("Sender not found!");
             return;
         }
 
-        System.out.print("Enter Receiver Mobile/Account: ");
-        long recInput = sc.nextLong();
+        System.out.print("Enter Receiver UPI ID: ");
+        String receiverUpi = sc.nextLine();
 
-        User receiver = findUser(recInput);
-
-        if (receiver == null)
-            receiver = findUserByAccount(recInput);
+        User receiver = findUserByUpi(receiverUpi);
 
         if (receiver == null) {
             System.out.println("Receiver not found!");
@@ -164,6 +126,7 @@ public class Phonepay {
             System.out.println("----------------------------");
             System.out.println("Name   : " + u.getName());
             System.out.println("Mobile : " + u.getMobile());
+            System.out.println("UPI ID : " + u.getUpiId());
             System.out.println("Bank   : " + u.getBank().getName());
             System.out.println("Acc No : XXXX" + last4);
         }
@@ -189,39 +152,14 @@ public class Phonepay {
         System.out.println("\n===== USER DETAILS =====");
         System.out.println("Name      : " + user.getName());
         System.out.println("Mobile    : " + user.getMobile());
+        System.out.println("UPI ID    : " + user.getUpiId());
         System.out.println("Bank      : " + user.getBank().getName());
         System.out.println("Account   : XXXX" + last4);
         System.out.printf("Balance   : ₹%.2f%n", user.getBalance());
-
-        System.out.println("\nLast 5 Transactions:");
-
-        List<Transaction> tx = user.getTransactions();
-
-        if (tx.isEmpty()) {
-            System.out.println("No transactions.");
-        } else {
-
-            int start = Math.max(0, tx.size() - 5);
-            int count = 1;
-
-            for (int i = tx.size() - 1; i >= start; i--) {
-                Transaction t = tx.get(i);
-
-                System.out.println("-----------------------");
-                System.out.println("Tx #" + count++);
-                System.out.println("Type  : " + t.getType());
-                System.out.println("With  : " +
-                        (t.getOtherMobile() == 0 ? "BANK" : t.getOtherMobile()));
-                System.out.printf("Amt   : ₹%.2f%n", t.getAmount());
-                System.out.println("Time  : " +
-                        t.getTime().format(TransactionService.FMT));
-            }
-        }
-
-        System.out.println("=======================");
     }
 
     static void showTransactions() {
+
         System.out.print("Enter Mobile Number: ");
         long mobile = sc.nextLong();
 
